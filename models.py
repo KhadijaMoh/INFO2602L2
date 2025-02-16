@@ -10,7 +10,6 @@ class User(db.Model):
   username = db.Column(db.String(80), unique=True, nullable=False)
   email = db.Column(db.String(120), unique=True, nullable=False)
   password = db.Column(db.String(120), nullable=False)
-  #creates a relationship field to get the user's todos
   todos = db.relationship('Todo', backref='user', lazy=True, cascade="all, delete-orphan")
 
   def __init__(self, username, email, password):
@@ -25,23 +24,17 @@ class User(db.Model):
   def __repr__(self):
       return f'<User {self.id} {self.username} - {self.email}>'
 
-  # Add method to User model in models.py
   def add_todo_category(self, todo_id, category_text):
-      # Fetch the todo by id
       todo = Todo.query.filter_by(id=todo_id, user_id=self.id).first()
-      # Make sure the todo exists and belongs to the current user
       if not todo:
           return False
 
-      # Check if category already exists for current user
       category = Category.query.filter_by(text=category_text, user_id=self.id).first()
       if not category:
-          # Create new category
           category = Category(user_id=self.id, text=category_text)
           db.session.add(category)
           db.session.commit()
 
-      # Associate todo with the category if not already associated
       if category not in todo.categories:
           todo.categories.append(category)
           db.session.add(todo)
@@ -51,7 +44,7 @@ class User(db.Model):
 
 class Todo(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #set userid as a foreign key to user.id 
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   text = db.Column(db.String(255), nullable=False)
   done = db.Column(db.Boolean, default=False)
 

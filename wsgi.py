@@ -27,7 +27,6 @@ def get_user(username):
   
 @app.cli.command('get-users')
 def get_users():
-  # gets all objects of a model
   users = User.query.all()
   print(users)
   
